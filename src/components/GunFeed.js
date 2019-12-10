@@ -77,10 +77,11 @@ export const GunFeed = ({ id, priv, epriv, oepriv }) => {
             throw new Error("Could not detect id in url");
           }
           legacy = parsed.searchParams.get("legacy");
-          hashUrlParams = new URLSearchParams(parsed.hash.substr(1));
+          const hashUrlParams = new URLSearchParams(parsed.hash.substr(1));
           subPriv = hashUrlParams.get("priv");
           subEpriv = hashUrlParams.get("epriv");
         } catch (e) {
+          console.log(e);
           // TODO: create new stream
           origin = "https://gun-streams.nmaro.now.sh";
           const pair = await Gun.SEA.pair();
