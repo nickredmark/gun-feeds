@@ -143,22 +143,21 @@ video {
   margin: 0;
 }
 
-.feed {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0%;
-}
 header {
   padding: 0.5rem;
   border-bottom: 1px solid lightgray;
   width: 100%;
 }
+header form,
 h1 {
   margin: 0;
   font-size: 1.5rem;
   display: block;
   margin: auto;
   max-width: 35rem;
+  width: 100%;
+}
+header input {
   width: 100%;
 }
 main {
@@ -189,6 +188,7 @@ main {
 
 ul {
   margin: 0;
+  padding: 0;
   list-style: none;
 }
 
@@ -198,4 +198,48 @@ input.new-sub {
   border-radius: none;
   border: none;
   border-top: 1px solid lightgray;
+}
+
+.sub-item-li {
+  position: relative;
+}
+.sub-item {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  border-bottom: 1px solid lightgray;
+  padding: 1rem 0;
+}
+.sub-item-li:last-child .sub-item {
+  border: none;
+}
+.sub-item-name {
+  display: block;
+  float: left;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.sub-item-date {
+  float: right;
+  font-size: 80%;
+  color: lightgray;
+}
+.sub-item-last-message {
+  clear: both;
+  display: block;
+  font-size: 90%;
+  color: darkgray;
+}
+.sub-item-remove {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: none;
+  color: lightgray;
+  padding: 0.5rem;
+  font-size: 80%;
+  text-decoration: none;
+}
+.sub-item-li:hover .sub-item-remove {
+  display: block;
 }

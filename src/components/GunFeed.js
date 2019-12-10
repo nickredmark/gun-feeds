@@ -12,7 +12,7 @@ require("gun/lib/rindexed");
 export const GunFeed = ({ id, priv, epriv, oepriv }) => {
   const [gun, setGun] = useState(null);
   const pub = getPub(id);
-  const pair = pub && priv && { pub, priv, epriv, oepriv };
+  const pair = pub && { pub, priv, epriv, oepriv };
   const [data, onData, put] = useGun(Gun, gun, useState, pair);
 
   useEffect(() => {
@@ -74,14 +74,15 @@ export const GunFeed = ({ id, priv, epriv, oepriv }) => {
           if (!subId) {
             throw new Error("Could not detect id in url");
           }
+          const legacy = parsed.searchParams.get("legacy");
           const hashUrlParams = new URLSearchParams(parsed.hash.substr(1));
           const subPriv = hashUrlParams.get("priv");
           const subEpriv = hashUrlParams.get("epriv");
-          const legacy = hashUrlParams.get("legacy");
           const subLinkId = `${id}.subs.${subId}`;
           const puts = [
             [`${id}.subs`, subId, { "#": subLinkId }],
-            [subLinkId, "sub", { "#": subId }]
+            [subLinkId, "sub", { "#": subId }],
+            [subLinkId, "origin", parsed.origin]
           ];
           if (legacy) {
             puts.push([subLinkId, "legacy", true]);

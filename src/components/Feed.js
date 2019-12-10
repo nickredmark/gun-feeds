@@ -35,7 +35,7 @@ export const Feed = ({
   }
 
   return (
-    <div className="feed">
+    <>
       <header>
         {editing ? (
           <form
@@ -66,12 +66,12 @@ export const Feed = ({
             {feed.name || "unnamed"}
             <a
               className="feed-permalink"
-              href={`?id=${id}${qs({ epriv }, "#")}`}
+              href={`${qs({ id }, "?")}${qs({ epriv }, "#")}`}
               target="_blank"
               onClick={e => {
                 e.preventDefault();
                 navigator.clipboard.writeText(
-                  `${location.origin}?id=${id}${qs({ epriv }, "#")}`
+                  `${location.origin}${qs({ id }, "?")}${qs({ epriv }, "#")}`
                 );
                 alert("Readonly URL copied to clipboard!");
               }}
@@ -82,48 +82,53 @@ export const Feed = ({
         )}
       </header>
       <main>
-        <ul>
-          {feed.subs
-            .filter(sub => sub.sub)
-            .sort(subComparator)
-            .map(({ sub, epriv, priv, legacy }) => {
-              const id = getId(sub);
-              return (
-                <li key={id} className="sub-item-li">
-                  <a
-                    href={`https://gun-streams.nmaro.now.sh${qs(
-                      { id, legacy },
-                      "?"
-                    )}${qs({ epriv, priv })}`}
-                    target="_blank"
-                    className="sub-item"
-                  >
-                    <span className="sub-item-name">{sub.name}</span>
-                    <span className="sub-item-date">
-                      {formatTime(getSubTimestamp(sub))}
-                    </span>
-                    <span className="sub-item-last-message">
-                      {sub.lastMessage && sub.lastMessage.text && (
-                        <ShortMessageContent message={sub.lastMessage} />
-                      )}
-                    </span>
-                  </a>
-                  {isWritable && (
+        <div className="content">
+          <ul>
+            {feed.subs
+              .filter(sub => sub.sub)
+              .sort(subComparator)
+              .map(({ origin, sub, epriv, priv, legacy }) => {
+                const id = getId(sub);
+                return (
+                  <li key={id} className="sub-item-li">
                     <a
-                      href="#"
-                      className="sub-item-remove"
-                      onClick={() => onDeleteSub({ space, streamId: id })}
+                      href={`${origin}${qs({ id, legacy }, "?")}${qs(
+                        { epriv, priv },
+                        "#"
+                      )}`}
+                      target="_blank"
+                      className="sub-item"
                     >
-                      X
+                      <span className="sub-item-name">
+                        {sub.name || sub.title}
+                      </span>
+                      <span className="sub-item-date">
+                        {formatTime(getSubTimestamp(sub))}
+                      </span>
+                      <span className="sub-item-last-message">
+                        {formatLastUpdate(
+                          sub.lastUpdate ||
+                            (sub.lastMessage && sub.lastMessage.text)
+                        )}
+                      </span>
                     </a>
-                  )}
-                </li>
-              );
-            })}
-        </ul>
+                    {isWritable && (
+                      <a
+                        href="#"
+                        className="sub-item-remove"
+                        onClick={() => onDeleteSub({ space, streamId: id })}
+                      >
+                        X
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
       </main>
       {isWritable && <AddSub onAddSub={onAddSub} />}
-    </div>
+    </>
   );
 };
 
@@ -154,12 +159,37 @@ const formatTime = timestamp => {
   return moment(timestamp).format("YYYY/MM/DD");
 };
 
-const getSubTimestamp = sub => {
-  if (sub.lastMessage && sub.lastMessage.created) {
-    return sub.lastMessage.created;
+const getSubTimestamp = sub => sub.updated || sub.created;
+
+const subComparator = (a, b) => getSubTimestamp(b.sub) - getSubTimestamp(a.sub);
+
+export const formatLastUpdate = lastUpdate => {
+  if (!lastUpdate) {
+    return "";
+  }
+  if (/^data:image\//.exec(lastUpdate)) {
+    return "[image]";
+  }
+  if (/^data:/.exec(lastUpdate)) {
+    return "[attachment]";
+  }
+  if (
+    /youtube\.com\/watch/.exec(lastUpdate) ||
+    /youtu\.be\//.exec(lastUpdate)
+  ) {
+    return "[youtube video]";
+  }
+  if (/twitter.com\/\w+\/status\/\d+/.exec(lastUpdate)) {
+    return "[twitter status]";
+  }
+  if (/^(\.+|-+|\*+|~+)$/.exec(lastUpdate)) {
+    return "[end]";
   }
 
-  return sub.created;
-};
+  const LENGTH = 50;
+  if (lastUpdate.length > LENGTH) {
+    return `${lastUpdate.substr(0, LENGTH)}...`;
+  }
 
-const subComparator = (a, b) => getSubTimestamp(b) - getSubTimestamp(a);
+  return lastUpdate;
+};
