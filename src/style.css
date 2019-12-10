@@ -243,3 +243,10 @@ input.new-sub {
 .sub-item-li:hover .sub-item-remove {
   display: block;
 }
+
+a {
+  cursor: pointer;
+}
+a:hover {
+  text-decoration: underline;
+}

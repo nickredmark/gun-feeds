@@ -61,29 +61,46 @@ export const GunFeed = ({ id, priv, epriv, oepriv }) => {
       feed={feed}
       id={id}
       onSetFeedName={name => put([id, "name", name])}
-      onAddSub={url => {
-        let parsed;
+      onDeleteSub={async subId => put([`${id}.subs`, subId, null])}
+      onAddSub={async url => {
+        let origin;
+        let subId;
+        let legacy;
+        let subPriv;
+        let subEpriv;
+        const puts = [];
         try {
-          parsed = new URL(url);
-        } catch (e) {
-          // TODO: create new stream
-          return;
-        }
-        try {
-          const subId = parsed.searchParams.get("id");
+          const parsed = new URL(url);
+          origin = parsed.origin;
+          subId = parsed.searchParams.get("id");
           if (!subId) {
             throw new Error("Could not detect id in url");
           }
-          const legacy = parsed.searchParams.get("legacy");
-          const hashUrlParams = new URLSearchParams(parsed.hash.substr(1));
-          const subPriv = hashUrlParams.get("priv");
-          const subEpriv = hashUrlParams.get("epriv");
+          legacy = parsed.searchParams.get("legacy");
+          hashUrlParams = new URLSearchParams(parsed.hash.substr(1));
+          subPriv = hashUrlParams.get("priv");
+          subEpriv = hashUrlParams.get("epriv");
+        } catch (e) {
+          // TODO: create new stream
+          origin = "https://gun-streams.nmaro.now.sh";
+          const pair = await Gun.SEA.pair();
+          subId = `~${pair.pub}`;
+          subPriv = pair.priv;
+          subEpriv = pair.epriv;
+          puts.push(
+            [subId, "created", +new Date(), pair],
+            [subId, "name", url, pair]
+          );
+        }
+        try {
           const subLinkId = `${id}.subs.${subId}`;
-          const puts = [
-            [`${id}.subs`, subId, { "#": subLinkId }],
-            [subLinkId, "sub", { "#": subId }],
-            [subLinkId, "origin", parsed.origin]
-          ];
+          puts.push(
+            ...[
+              [`${id}.subs`, subId, { "#": subLinkId }],
+              [subLinkId, "sub", { "#": subId }],
+              [subLinkId, "origin", origin]
+            ]
+          );
           if (legacy) {
             puts.push([subLinkId, "legacy", true]);
           }

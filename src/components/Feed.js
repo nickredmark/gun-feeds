@@ -56,11 +56,12 @@ export const Feed = ({
           <h1
             className={editable ? "editable" : ""}
             onDoubleClick={
-              editable &&
-              (() => {
-                setNewName(document.name);
-                setEditing(true);
-              })
+              editable
+                ? () => {
+                    setNewName(document.name);
+                    setEditing(true);
+                  }
+                : undefined
             }
           >
             {feed.name || "unnamed"}
@@ -114,9 +115,8 @@ export const Feed = ({
                     </a>
                     {isWritable && (
                       <a
-                        href="#"
                         className="sub-item-remove"
-                        onClick={() => onDeleteSub({ space, streamId: id })}
+                        onClick={() => onDeleteSub(id)}
                       >
                         X
                       </a>
