@@ -167,6 +167,11 @@ export const formatLastUpdate = lastUpdate => {
   if (!lastUpdate) {
     return "";
   }
+
+  if (typeof lastUpdate !== "string") {
+    return "[unknown message format]";
+  }
+
   if (/^data:image\//.exec(lastUpdate)) {
     return "[image]";
   }
