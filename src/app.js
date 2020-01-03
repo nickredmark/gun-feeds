@@ -13,7 +13,7 @@ const App = () => {
 
   useEffect(() => {
     if (!id) {
-      window.location = `https://gun-create.nmaro.now.sh?oepriv=true&next=${encodeURIComponent(
+      window.location = `https://nmaro.now.sh/gun-create/?oepriv=true&next=${encodeURIComponent(
         window.location.origin
       )}`;
     }
