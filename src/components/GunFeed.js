@@ -72,7 +72,7 @@ export const GunFeed = ({ id, priv, epriv, oepriv, parent }) => {
         const puts = [];
         try {
           const parsed = new URL(url);
-          origin = parsed.origin;
+          origin = parsed.origin + parsed.pathname;
           subId = parsed.searchParams.get("id");
           if (!subId) {
             throw new Error("Could not detect id in url");
@@ -83,7 +83,7 @@ export const GunFeed = ({ id, priv, epriv, oepriv, parent }) => {
           subEpriv = hashUrlParams.get("epriv");
         } catch (e) {
           // TODO: create new stream
-          origin = "https://gun-streams.nmaro.now.sh";
+          origin = "https://nmaro.now.sh/gun-streams/";
           const pair = await Gun.SEA.pair();
           subId = `~${pair.pub}`;
           subPriv = pair.priv;
