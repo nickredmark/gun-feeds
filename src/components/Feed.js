@@ -8,6 +8,7 @@ export const Feed = ({
   priv,
   epriv,
   feed,
+  parent,
   onSetFeedName,
   onAddSub,
   onDeleteSub
@@ -90,15 +91,29 @@ export const Feed = ({
               .sort(subComparator)
               .map(({ origin, sub, epriv, priv, legacy }) => {
                 const id = getId(sub);
+                const url = `${origin}${qs({ id, legacy }, "?")}${qs(
+                  { epriv, priv },
+                  "#"
+                )}`;
                 return (
                   <li key={id} className="sub-item-li">
                     <a
-                      href={`${origin}${qs({ id, legacy }, "?")}${qs(
-                        { epriv, priv },
-                        "#"
-                      )}`}
+                      href={url}
                       target="_blank"
                       className="sub-item"
+                      onClick={e => {
+                        if (parent) {
+                          e.preventDefault();
+                          window.parent.postMessage(
+                            {
+                              type: "open-child",
+                              url,
+                              name: window.name
+                            },
+                            parent
+                          );
+                        }
+                      }}
                     >
                       <span className="sub-item-name">
                         {sub.name || sub.title}

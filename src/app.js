@@ -9,6 +9,7 @@ const App = () => {
   const priv = hashUrlParams.get("priv");
   const epriv = hashUrlParams.get("epriv");
   const oepriv = hashUrlParams.get("oepriv");
+  const parent = hashUrlParams.get("parent");
 
   useEffect(() => {
     if (!id) {
@@ -22,7 +23,15 @@ const App = () => {
     return <div>Loading...</div>;
   }
 
-  return <GunFeed id={id} priv={priv} epriv={epriv} oepriv={oepriv} />;
+  return (
+    <GunFeed
+      id={id}
+      priv={priv}
+      epriv={epriv}
+      oepriv={oepriv}
+      parent={parent}
+    />
+  );
 };
 
 export default hot(App);

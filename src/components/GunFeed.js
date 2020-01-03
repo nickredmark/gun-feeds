@@ -9,7 +9,7 @@ require("gun/lib/radisk");
 require("gun/lib/store");
 require("gun/lib/rindexed");
 
-export const GunFeed = ({ id, priv, epriv, oepriv }) => {
+export const GunFeed = ({ id, priv, epriv, oepriv, parent }) => {
   const [gun, setGun] = useState(null);
   const pub = getPub(id);
   const pair = pub && { pub, priv, epriv, oepriv };
@@ -62,6 +62,7 @@ export const GunFeed = ({ id, priv, epriv, oepriv }) => {
       id={id}
       onSetFeedName={name => put([id, "name", name])}
       onDeleteSub={async subId => put([`${id}.subs`, subId, null])}
+      parent={parent}
       onAddSub={async url => {
         let origin;
         let subId;
